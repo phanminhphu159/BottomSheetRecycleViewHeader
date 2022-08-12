@@ -1,13 +1,17 @@
 package com.thuanpx.mvvm_architecture.feature.home
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import androidx.annotation.NonNull
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.thuanpx.ktext.context.launchAndRepeatWithViewLifecycle
 import com.thuanpx.ktext.recyclerView.initRecyclerViewAdapter
 import com.thuanpx.mvvm_architecture.R
@@ -27,6 +31,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
 
     private var categoryAdapter: CategoryAdapter? = null
     private var bottomSheetAdapter: BottomSheetAdapter? = null
+    private var topPeekHeight: Float = 0F
     private val listCategory: ArrayList<ItemCatergory> = arrayListOf()
     private val listTabTitles =
         arrayListOf(
@@ -62,77 +67,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
             R.drawable.ic_real_estate,
             R.drawable.ic_health_care
         )
-//    private val listCategory: ArrayList<ItemCatergory> = arrayListOf(
-//        ItemCatergory(
-//            resources.getString(R.string.All),
-//            R.drawable.ic_all,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.FoodAndDrinks),
-//            R.drawable.ic_food_and_drinks,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.BeautyAndSpas),
-//            R.drawable.ic_beauty_and_spas,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.ThingsToDo),
-//            R.drawable.ic_things_to_do,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Services),
-//            R.drawable.ic_services,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Shopping),
-//            R.drawable.ic_shoppping,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Education),
-//            R.drawable.ic_education,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.PlacesToStay),
-//            R.drawable.ic_places_to_stay,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Repairs),
-//            R.drawable.ic_repairs,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.HomeAndGarden),
-//            R.drawable.ic_home_and_garden,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Pets),
-//            R.drawable.ic_pets,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.Jobs),
-//            R.drawable.ic_jobs,
-//            false//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.RealEstate),
-//            R.drawable.ic_real_estate,
-//            false
-//        ),
-//        ItemCatergory(
-//            resources.getString(R.string.HealthCare),
-//            R.drawable.ic_health_care,
-//            false
-//        )
-//    )
 
     override fun inflateViewBinding(
         inflater: LayoutInflater,
@@ -170,9 +104,60 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
     }
 
     private fun initBottomSheet() {
-        BottomSheetBehavior.from(viewBinding.bottomSheetParent.root).peekHeight = 220
+        setUpBottomSheetBehavior()
         initRecyclerViewTab()
         initRecyclerViewContent()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setUpBottomSheetBehavior() {
+        BottomSheetBehavior.from(viewBinding.bottomSheetParent.root).peekHeight = 220
+        BottomSheetBehavior.from(viewBinding.bottomSheetParent.root)
+            .setBottomSheetCallback(object : BottomSheetCallback() {
+                override fun onStateChanged(@NonNull bottomSheet: View, newState: Int) {
+                    Log.e("onStateChanged", "onStateChanged:$newState")
+                    with(BottomSheetBehavior.from(viewBinding.bottomSheetParent.root)) {
+                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+//                            state = stateBottomSheet()
+                        }
+                        if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+//                            state = stateBottomSheet()
+                        }
+                        if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+//                            state = stateBottomSheet()
+                        }
+                    }
+                }
+
+                override fun onSlide(@NonNull bottomSheet: View, slideOffset: Float) {
+                    topPeekHeight = slideOffset
+                    Log.e("onSlide", topPeekHeight.toString())
+                    if
+                    BottomSheetBehavior.from(viewBinding.bottomSheetParent.root).state = stateBottomSheet()
+                }
+            })
+
+        viewBinding.bottomSheetParent.rvBottomSheetContent.setOnTouchListener(OnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN ->                         // Disallow NestedScrollView to intercept touch events.
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                MotionEvent.ACTION_UP ->                         // Allow NestedScrollView to intercept touch events.
+                    v.parent.requestDisallowInterceptTouchEvent(false)
+            }
+            // Handle RecyclerView touch events.
+            v.onTouchEvent(event)
+            true
+        })
+    }
+
+    private fun stateBottomSheet() : Int {
+        return if (topPeekHeight <  0.25F ) {
+            BottomSheetBehavior.STATE_COLLAPSED
+        } else if (topPeekHeight > 0.75F ) {
+            BottomSheetBehavior.STATE_EXPANDED
+        } else {
+            BottomSheetBehavior.STATE_HALF_EXPANDED
+        }
     }
 
     private fun initRecyclerViewTab() {
@@ -186,7 +171,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
         )
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerViewContent() {
         bottomSheetAdapter = BottomSheetAdapter()
         viewBinding.bottomSheetParent.rvBottomSheetContent.initRecyclerViewAdapter(
@@ -194,17 +178,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
             GridLayoutManager(requireContext(), 1),
             true
         )
-        viewBinding.bottomSheetParent.rvBottomSheetContent.setOnTouchListener(OnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN ->                         // Disallow NestedScrollView to intercept touch events.
-                    v.parent.requestDisallowInterceptTouchEvent(true)
-                MotionEvent.ACTION_UP ->                         // Allow NestedScrollView to intercept touch events.
-                    v.parent.requestDisallowInterceptTouchEvent(false)
-            }
-            // Handle RecyclerView touch events.
-            v.onTouchEvent(event)
-            true
-        })
     }
 
     private fun setUpCategory() {

@@ -14,7 +14,7 @@ import com.thuanpx.mvvm_architecture.model.entity.ItemCatergory
 class CategoryAdapter(
     private val listener: OnItemClickedListener
 ) : BaseRecyclerViewAdapter<ItemCatergory, CategoryViewHolder>() {
-    private var selectedPosition: Int = RecyclerView.NO_POSITION
+    private var selectedPosition: Int = 0
 
     inner class CategoryViewHolder(
         private val itemBottomSheetBinding: ItemBottomSheetBinding,
