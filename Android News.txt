@@ -1,0 +1,6 @@
+https://medium.com/huawei-developers/why-should-we-use-use-case-classes-in-our-android-projects-142de0f952fd
+https://medium.com/android-news/a-beginners-guide-to-setting-up-opencv-android-library-on-android-studio-19794e220f3c
+https://stackoverflow.com/questions/60218265/android-bottomsheet-how-can-i-know-if-user-is-dragging-up-or-down-the-bottomshe
+https://stackoverflow.com/questions/30047665/delay-call-to-onquerytextchange-in-searchview-onquerytextlistener-with-searchv
+https://stackoverflow.com/questions/30047665/delay-call-to-onquerytextchange-in-searchview-onquerytextlistener-with-searchv
+https://stackoverflow.com/questions/34310530/sliding-bottomsheet-like-google-map
